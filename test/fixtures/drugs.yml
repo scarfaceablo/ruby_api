@@ -1,0 +1,21 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  id_drug: MyString
+  registered_name: MyString
+  active_ingredient: MyString
+  pharmaceutical_form: MyString
+  insurance_list: MyString
+  issuing: MyString
+  atc: MyString
+  license_holder: MyString
+
+two:
+  id_drug: MyString
+  registered_name: MyString
+  active_ingredient: MyString
+  pharmaceutical_form: MyString
+  insurance_list: MyString
+  issuing: MyString
+  atc: MyString
+  license_holder: MyString

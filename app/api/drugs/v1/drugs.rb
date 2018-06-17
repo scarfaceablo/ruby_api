@@ -21,37 +21,36 @@ module Drugs
 
         params do
           requires :user_type, type: String
-          optional :sort_by, type: String
+          
+          # secondary filter insurance_list, in request split params with +
+          optional :insurance_list, 
+                    type: Array[String], 
+                    allow_blank: false, 
+                    coerce_with: ->(val) { val.split(/\s+/).map(&:to_s) }
          end
         
         desc 'Return a list of drugs by user_type'
-        #active_ingredient
           get do
-            column_names = Drug.column_names
           case params[:user_type]
-            when "Student","Other"
+            
+          when "Student", "Other"
+            puts params[:insurance_list]
+            if params[:insurance_list].to_s.strip.empty?
+              present Drug.where(issuing: "BR"), with: Drug_present
+            else
+              # secondary filter
+              present Drug.where(issuing: "BR", insurance_list: params[:insurance_list]), with: Drug_present
+             
+            end
 
-              unless params[:sort_by].to_s.strip.empty?
-                unless column_names.include? params[:sort_by].to_s
-                  error!({ error: 'sort_by does not exists' }, 404)
-                else
-                  present Drug.where(issuing: "BR").order("#{params[:sort_by]} ASC"), with: Drug_present
-                end
-              else
-                present Drug.where(issuing: "BR"), with: Drug_present
-              end
+          when "MD"
+            if params[:insurance_list].to_s.strip.empty?
+              present Drug.where.not(issuing: "BR"), with: Drug_present
+            else
+              # secondary filter
+              present Drug.where.not(issuing: "BR").where(insurance_list: params[:insurance_list]), with: Drug_present
+            end
 
-            when "MD"
-
-              unless params[:sort_by].to_s.strip.empty?
-                unless column_names.include? params[:sort_by].to_s
-                  error!({ error: 'sort_by does not exists' }, 404)
-                else
-                  present Drug.where.not(issuing: "BR").order("#{params[:sort_by]} ASC"), with: Drug_present
-                end
-              else
-                present Drug.where.not(issuing: "BR"), with: Drug_present
-              end
             else
               error!({ error: 'user_type does not exists' }, 404)
           end
